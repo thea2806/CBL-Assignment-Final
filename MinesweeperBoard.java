@@ -44,6 +44,28 @@ public class MinesweeperBoard {
     }
 
     public int generateMines(Cell board[][], int minesNum) {
-        return 0;
+        int rows = sizeRow;
+        int columns = sizeColumn;
+        int number = 0;
+        Random random = new Random();
+        for (int i = 0; i < minesNum; i++) {
+            int row;
+            int col;
+            do {
+                row = random.nextInt(rows);
+                col = random.nextInt(columns);
+
+            } while (board[row][col].hasMine);
+            board[row][col].hasMine = true;
         }
+
+        for (int i = 0; i < sizeRow; i++) {
+            for (int j = 0; j < sizeColumn; j++) {
+                if(board[i][j].hasMine) {
+                    number++;
+                }
+            }
+        }
+        return number;
     }
+}

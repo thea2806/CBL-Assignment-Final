@@ -30,7 +30,7 @@ public class MinesweeperBoardTest {
         level3.board[0][26].hasMine = true;
         level3.board[1][25].hasMine = true;
         level3.board[1][26].hasMine = true;
-        int expectedResult3 = 2;
+        int expectedResult3 = 4;
         assertEquals(expectedResult3, level3.neighborMines(test3));
     }
 

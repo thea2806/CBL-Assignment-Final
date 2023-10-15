@@ -60,6 +60,31 @@ public class MinesweeperBoard {
     }
 
     public boolean specialAbilities(Cell[][] board, int abilitiesNum) {
-        return false;
+        int rows = sizeRow;
+        int columns = sizeColumn;
+        int number = 0;
+        Random random = new Random();
+        for (int i = 0; i < abilitiesNum; i++) {
+            int row;
+            int col;
+            do {
+                row = random.nextInt(rows);
+                col = random.nextInt(columns);
+
+            } while (board[row][col].hasMine && board[row][col].hasAbility);
+            board[row][col].hasAbility = true;
+        }
+        for(int i=0;i<sizeRow;i++) {
+            for(int j=0;j<sizeColumn;j++) {
+                if(board[i][j].hasAbility) {
+                    if(board[i][j].hasMine) {
+                        return false;
+                    } else {
+                        number ++;
+                    }
+                }
+            }
+        }
+        return number==abilitiesNum;
     }
 }

@@ -15,6 +15,10 @@ public class MinesweeperBoard {
         this.sizeColumn = sizeColumn;
     }
 
+    public Cell[][] getBoard() {
+        return this.board;
+    }
+
     public int neighborMines(Cell cell) {
         int sizeRow2 = sizeRow + 2;
         int sizeColumn2 = sizeColumn + 2;
@@ -38,4 +42,8 @@ public class MinesweeperBoard {
         }
         return neighborMines;
     }
-}
+
+    public int generateMines(Cell board[][], int minesNum) {
+        return 0;
+        }
+    }

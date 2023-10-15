@@ -58,4 +58,8 @@ public class MinesweeperBoard {
             board[row][col].hasMine = true;
         }
     }
+
+    public boolean specialAbilities(Cell[][] board, int abilitiesNum) {
+        return false;
+    }
 }

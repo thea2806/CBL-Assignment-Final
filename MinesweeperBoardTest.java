@@ -61,5 +61,32 @@ public class MinesweeperBoardTest {
         assertEquals(expectedResult3, level3.generateMines(level3.getBoard(), test3));
     }
 
+    /**
+     * We test whether this method places the correct number of abilities on the board, meaning 
+     * that it doesn't place two abilities in the same cell, as well as whether it places an
+     * ability in a cell that contains a mine.
+     * For this, we will first create the test cases for a method that returns a boolean, which 
+     * should be true only in the case where the abilities are placed correctly.
+     * After we implement this method and it passes the all the tests, we will change it to a void
+     * method, which we need in our program.
+     */
+    @Test
+    public void specialAbilitiesTest() {
+        //Test case for level 1 that has 1 special ability
+        int test1 = 1;
+        boolean expectedResult1 = true;
+        assertEquals(expectedResult1, level1.specialAbilities(level1.getBoard(), test1));
+
+        //Test case for level 2 that has 3 special abilities
+        int test2 = 3;
+        boolean expectedResult2 = true;
+        assertEquals(expectedResult2, level2.specialAbilities(level2.getBoard(), test2));
+
+        //Test case for level 3 that has 1 special ability
+        int test3 = 5;
+        boolean expectedResult3 = true;
+        assertEquals(expectedResult3, level3.specialAbilities(level3.getBoard(), test3));
+    }
+
 }
 

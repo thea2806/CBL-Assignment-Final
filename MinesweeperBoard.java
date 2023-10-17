@@ -1,18 +1,19 @@
 import java.util.Random;
+import javax.swing.JButton;
 
 public class MinesweeperBoard {
     Cell[][] board = new Cell[100][100];
     int sizeRow;
     int sizeColumn;
 
-    public MinesweeperBoard(int sizeRow, int sizeColumn) {
-        for (int i = 0; i < sizeRow; i++) {
-            for (int j = 0; j < sizeColumn; j++) {
-                board[i][j] = new Cell(i, j, false);
+    public MinesweeperBoard(int row, int column) {
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                board[i][j] = new Cell(i, j);
             }
         }
-        this.sizeRow = sizeRow;
-        this.sizeColumn = sizeColumn;
+        this.sizeRow = row;
+        this.sizeColumn = column;
     }
 
     public Cell[][] getBoard() {
@@ -43,21 +44,27 @@ public class MinesweeperBoard {
         return neighborMines;
     }
 
-    public void generateMines(Cell board[][], int minesNum) {
+    public void generateMines(int minesNum, JButton[][] game) {
+
         int rows = sizeRow;
         int columns = sizeColumn;
+        int row;
+        int col;
         Random random = new Random();
-        for (int i = 0; i < minesNum; i++) {
-            int row;
-            int col;
-            do {
-                row = random.nextInt(rows);
-                col = random.nextInt(columns);
+        int minesPlaced = 0;
 
-            } while (board[row][col].hasMine);
-            board[row][col].hasMine = true;
+        while (minesPlaced < minesNum) {
+            row = random.nextInt(rows);
+            col = random.nextInt(columns);
+
+            if (!board[row][col].hasMine) {
+                board[row][col].hasMine = true;
+                minesPlaced++;
+            }
+            
         }
     }
+
 
     public void specialAbilities(Cell[][] board, int abilitiesNum) {
         int rows = sizeRow;
@@ -72,6 +79,11 @@ public class MinesweeperBoard {
 
             } while (board[row][col].hasMine && board[row][col].hasAbility);
             board[row][col].hasAbility = true;
+
         }
+    }
+
+    public String getText() {
+        return null;
     }
 }

@@ -8,6 +8,8 @@ public class Minesweeper {
     static JLabel label = new JLabel();
     static JPanel panel = new JPanel();
     static JPanel boardPanel = new JPanel();
+    static JButton[][] game = new JButton[100][100];
+    
 
     private class Tiles extends JButton {
         int row;
@@ -22,10 +24,8 @@ public class Minesweeper {
 
     public Minesweeper(int row, int column, JFrame frameGame) {
 
-        MinesweeperBoard board = new MinesweeperBoard(row, column);
-
         frameGame.setSize(cellSize * row, cellSize * column);
-        //frameGame.setResizable(false);
+        // frameGame.setResizable(false);
         frameGame.setLocationRelativeTo(null);
         frameGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frameGame.setLayout(new BorderLayout());
@@ -52,9 +52,10 @@ public class Minesweeper {
                 Tiles cell = new Tiles(i, j);
                 cell.setMargin(new Insets(0, 0, 0, 0));
                 cell.setPreferredSize(new Dimension(cellSize, cellSize));
-                // board.board[i][j] = cell;
+                MinesweeperBoard board = new MinesweeperBoard(row, column);
+                game[i][j] = cell;
 
-                //cell.setFocusable(false);
+                // cell.setFocusable(false);
                 // cell.setMargin(new Inserts(0,0,0,0));
 
                 boardPanel.add(cell);
@@ -69,3 +70,4 @@ public class Minesweeper {
     }
 
 }
+

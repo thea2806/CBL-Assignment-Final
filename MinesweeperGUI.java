@@ -1,7 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
-
 import javax.swing.*;
 
 public class MinesweeperGUI implements MouseListener {
@@ -11,12 +10,17 @@ public class MinesweeperGUI implements MouseListener {
     static JPanel panel = new JPanel();
     static JPanel boardPanel = new JPanel();
     JButton[][] game = new JButton[100][100];
-    //Boolean[][] isPressed = new Boolean[100][100];
+    // Boolean[][] isPressed = new Boolean[100][100];
     MinesweeperBoard gameBoard;
     int neighborMines;
     int row;
     int column;
     int firstClick;
+    int minesNum;
+    ImageIcon imageIcon = new ImageIcon("D:\\Flag.png"); // Replace with the actual path to your image
+    Image image = imageIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+    ImageIcon flag = new ImageIcon(image);
+
 
     static class Tiles extends JButton {
         static int row;
@@ -29,7 +33,7 @@ public class MinesweeperGUI implements MouseListener {
 
     }
 
-    public MinesweeperGUI(int row, int column) {
+    public MinesweeperGUI(int row, int column, int minesNum) {
         firstClick = 0;
         this.row = row;
         this.column = column;
@@ -77,20 +81,42 @@ public class MinesweeperGUI implements MouseListener {
 
             }
         }
-        gameBoard.generateMines(10, game);
+        gameBoard.generateMines(minesNum, game);
         frameGame.setVisible(true);
     }
 
     public void revealCell(int row, int column) {
-        if(gameBoard.getBoard()[row][column].hasMine) {
-                    game[row][column].setText("MINE");
-                    endGame();
-                } else {
-                if(gameBoard.neighborMines(gameBoard.getBoard()[row][column])>0) {
-                    game[row][column].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[row][column])));
-                }
+        if (gameBoard.getBoard()[row][column].hasMine) {
+            endGame();
+        } else {
+            if (gameBoard.neighborMines(gameBoard.getBoard()[row][column]) > 0) {
+                game[row][column].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[row][column])));
             }
+        }
+    }
 
+    public void cellExpansion(int row, int column) {
+        if (row < 0 || row >= this.row || column < 0 || column >= this.column) {
+            return;
+        }
+        
+        // Check if the cell has already been revealed
+        if (! game[row][column].isEnabled()) {
+            return;
+        }
+        game[row][column].setEnabled(false);
+        if (gameBoard.getBoard()[row][column].hasMine) {
+            return;
+        } else {
+        if (gameBoard.neighborMines(gameBoard.getBoard()[row][column]) > 0) {
+            game[row][column].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[row][column])));
+        }
+    }
+        for(int i=row-1;i<=row+1;i++) {
+            for(int j=column-1;j<=column+1;j++) {
+                cellExpansion(i,j);
+            }
+        }
     }
 
     public JButton getButton(int i, int j) {
@@ -104,8 +130,9 @@ public class MinesweeperGUI implements MouseListener {
         boardPanel.setVisible(false);
         frameGame.add(results);
     }
+
     public static void main(String[] args) {
-        MinesweeperGUI minesweeper = new MinesweeperGUI(16, 30);
+        MinesweeperGUI minesweeper = new MinesweeperGUI(9, 9, 10);
     }
 
     @Override
@@ -124,17 +151,17 @@ public class MinesweeperGUI implements MouseListener {
                 }
             }
             if (buttonPressed) {
-                firstClick ++;
+                firstClick++;
                 break;
             }
         }
 
         if (SwingUtilities.isLeftMouseButton(e)) {
-            // Left-click 
-            //System.out.println("Left-click on row " + i + ", col " + j);
+            // Left-click
+            // System.out.println("Left-click on row " + i + ", col " + j);
             game[i][j].setEnabled(false);
-            if(firstClick == 1) {
-                if(gameBoard.getBoard()[i][j].hasMine) {
+            if (firstClick == 1) {
+                if (gameBoard.getBoard()[i][j].hasMine) {
                     gameBoard.getBoard()[i][j].hasMine = false;
                     System.out.print("first click");
                     Random random = new Random();
@@ -143,19 +170,20 @@ public class MinesweeperGUI implements MouseListener {
                     do {
                         row2 = random.nextInt(row);
                         column2 = random.nextInt(column);
-        
+
                     } while (gameBoard.getBoard()[row2][column2].hasMine);
                     gameBoard.getBoard()[row2][column2].hasMine = true;
                 }
-            } 
-            revealCell(i,j);
+            }
+            revealCell(i, j);
+            cellExpansion(i,j);
         } else if (SwingUtilities.isRightMouseButton(e)) {
-            // Right-click 
-            game[i][j].setText("F");
+            // Right-click
+            game[i][j].setIcon(flag);
         }
 
     }
-    
+
     @Override
     public void mousePressed(MouseEvent e) {
         return;

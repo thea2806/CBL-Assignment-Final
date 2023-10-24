@@ -1,10 +1,12 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Random;
+
 import javax.swing.*;
 
 public class MinesweeperGUI implements MouseListener {
     static JFrame frameGame = new JFrame("Minesweeper");
-    static int cellSize = 70;
+    static int cellSize = 50;
     static JLabel label = new JLabel();
     static JPanel panel = new JPanel();
     static JPanel boardPanel = new JPanel();
@@ -14,6 +16,7 @@ public class MinesweeperGUI implements MouseListener {
     int neighborMines;
     int row;
     int column;
+    int firstClick;
 
     static class Tiles extends JButton {
         static int row;
@@ -27,6 +30,7 @@ public class MinesweeperGUI implements MouseListener {
     }
 
     public MinesweeperGUI(int row, int column) {
+        firstClick = 0;
         this.row = row;
         this.column = column;
         frameGame.setSize(cellSize * row, cellSize * column);
@@ -53,7 +57,6 @@ public class MinesweeperGUI implements MouseListener {
         int i;
         int j;
         gameBoard = new MinesweeperBoard(row, column);
-        
 
         // MinesweeperBoard board = new MinesweeperBoard(Tiles.row, Tiles.column);
         Cell[][] place = new Cell[100][100];
@@ -102,7 +105,7 @@ public class MinesweeperGUI implements MouseListener {
         frameGame.add(results);
     }
     public static void main(String[] args) {
-        MinesweeperGUI minesweeper = new MinesweeperGUI(9, 9);
+        MinesweeperGUI minesweeper = new MinesweeperGUI(16, 30);
     }
 
     @Override
@@ -121,7 +124,8 @@ public class MinesweeperGUI implements MouseListener {
                 }
             }
             if (buttonPressed) {
-                break; 
+                firstClick ++;
+                break;
             }
         }
 
@@ -129,6 +133,21 @@ public class MinesweeperGUI implements MouseListener {
             // Left-click 
             //System.out.println("Left-click on row " + i + ", col " + j);
             game[i][j].setEnabled(false);
+            if(firstClick == 1) {
+                if(gameBoard.getBoard()[i][j].hasMine) {
+                    gameBoard.getBoard()[i][j].hasMine = false;
+                    System.out.print("first click");
+                    Random random = new Random();
+                    int row2;
+                    int column2;
+                    do {
+                        row2 = random.nextInt(row);
+                        column2 = random.nextInt(column);
+        
+                    } while (gameBoard.getBoard()[row2][column2].hasMine);
+                    gameBoard.getBoard()[row2][column2].hasMine = true;
+                }
+            } 
             revealCell(i,j);
         } else if (SwingUtilities.isRightMouseButton(e)) {
             // Right-click 

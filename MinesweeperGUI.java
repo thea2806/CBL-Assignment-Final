@@ -11,8 +11,9 @@ public class MinesweeperGUI implements MouseListener {
     JButton[][] game = new JButton[100][100];
     //Boolean[][] isPressed = new Boolean[100][100];
     MinesweeperBoard gameBoard;
+    int neighborMines;
 
-    class Tiles extends JButton {
+    static class Tiles extends JButton {
         static int row;
         static int column;
 
@@ -23,8 +24,7 @@ public class MinesweeperGUI implements MouseListener {
 
     }
 
-    public MinesweeperGUI(int row, int column, JFrame frameGame) {
-
+    public MinesweeperGUI(int row, int column) {
         frameGame.setSize(cellSize * row, cellSize * column);
         frameGame.setLocationRelativeTo(null);
         frameGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,7 +70,7 @@ public class MinesweeperGUI implements MouseListener {
 
             }
         }
-        gameBoard.generateMines(50, game);
+        gameBoard.generateMines(10, game);
         frameGame.setVisible(true);
     }
 
@@ -78,8 +78,13 @@ public class MinesweeperGUI implements MouseListener {
 
     }
 
+    public JButton getButton(int i, int j) {
+        return game[i][j];
+    }
+
+
     public static void main(String[] args) {
-        MinesweeperGUI minesweeper = new MinesweeperGUI(8, 8, frameGame);
+        MinesweeperGUI minesweeper = new MinesweeperGUI(9, 9);
     }
 
     @Override
@@ -98,8 +103,14 @@ public class MinesweeperGUI implements MouseListener {
                 }
             }
             if (buttonPressed) {
+                if(gameBoard.getBoard()[i][j].hasMine) {
+                    game[i][j].setText("MINE")
+                } else {
+                if(gameBoard.neighborMines(gameBoard.getBoard()[i][j])>0) {
+                    game[i][j].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[i][j])));
+                }
+            }
                 break; 
-
             }
         }
 
@@ -107,6 +118,7 @@ public class MinesweeperGUI implements MouseListener {
             // Left-click 
             System.out.println("Left-click on row " + i + ", col " + j);
             game[i][j].setEnabled(false);
+            gameBoard.revealCell(board);
         } else if (SwingUtilities.isRightMouseButton(e)) {
             // Right-click 
             game[i][j].setText("F");

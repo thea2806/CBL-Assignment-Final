@@ -6,14 +6,14 @@ public class MinesweeperBoard {
     int sizeRow;
     int sizeColumn;
 
-    public MinesweeperBoard(int row, int column) {
-        for (int i = 0; i < row; i++) {
-            for (int j = 0; j < column; j++) {
+    public MinesweeperBoard(int rowSize, int columnSize) {
+        for (int i = 0; i < rowSize; i++) {
+            for (int j = 0; j < columnSize; j++) {
                 board[i][j] = new Cell(i, j);
             }
         }
-        this.sizeRow = row;
-        this.sizeColumn = column;
+        this.sizeRow = rowSize;
+        this.sizeColumn = columnSize;
     }
 
     public Cell[][] getBoard() {
@@ -61,10 +61,9 @@ public class MinesweeperBoard {
                 board[row][col].hasMine = true;
                 minesPlaced++;
             }
-            
+
         }
     }
-
 
     public void specialAbilities(Cell[][] board, int abilitiesNum) {
         int rows = sizeRow;
@@ -81,6 +80,20 @@ public class MinesweeperBoard {
             board[row][col].hasAbility = true;
 
         }
+    }
+
+    public void revealCell(Cell cell) {
+        if(board[cell.row][cell.column].hasMine) {
+            endGame();
+        } else {
+            board[cell.row][cell.column].setRevealed();
+            String neighborMines = String.valueOf(neighborMines(cell));
+            cell.tile.setText(neighborMines);
+        }
+    }
+
+    public void endGame() {
+        System.out.print("end game");
     }
 
     public String getText() {

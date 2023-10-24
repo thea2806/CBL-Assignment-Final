@@ -12,6 +12,8 @@ public class MinesweeperGUI implements MouseListener {
     //Boolean[][] isPressed = new Boolean[100][100];
     MinesweeperBoard gameBoard;
     int neighborMines;
+    int row;
+    int column;
 
     static class Tiles extends JButton {
         static int row;
@@ -25,6 +27,8 @@ public class MinesweeperGUI implements MouseListener {
     }
 
     public MinesweeperGUI(int row, int column) {
+        this.row = row;
+        this.column = column;
         frameGame.setSize(cellSize * row, cellSize * column);
         frameGame.setLocationRelativeTo(null);
         frameGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -82,7 +86,13 @@ public class MinesweeperGUI implements MouseListener {
         return game[i][j];
     }
 
-
+    public void endGame() {
+        JPanel results = new JPanel();
+        results.setSize(500, 500);
+        results.setBackground(Color.BLUE);
+        boardPanel.setVisible(false);
+        frameGame.add(results);
+    }
     public static void main(String[] args) {
         MinesweeperGUI minesweeper = new MinesweeperGUI(9, 9);
     }
@@ -103,19 +113,20 @@ public class MinesweeperGUI implements MouseListener {
                 }
             }
             if (buttonPressed) {
-                if(gameBoard.getBoard()[i][j].hasMine) {
-                    game[i][j].setText("MINE")
-                } else {
-                if(gameBoard.neighborMines(gameBoard.getBoard()[i][j])>0) {
-                    game[i][j].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[i][j])));
-                }
-            }
                 break; 
             }
         }
 
         if (SwingUtilities.isLeftMouseButton(e)) {
             // Left-click 
+            if(gameBoard.getBoard()[i][j].hasMine) {
+                    game[i][j].setText("MINE");
+                    endGame();
+                } else {
+                if(gameBoard.neighborMines(gameBoard.getBoard()[i][j])>0) {
+                    game[i][j].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[i][j])));
+                }
+            }
             System.out.println("Left-click on row " + i + ", col " + j);
             game[i][j].setEnabled(false);
             gameBoard.revealCell(board);

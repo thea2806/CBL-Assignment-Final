@@ -79,6 +79,14 @@ public class MinesweeperGUI implements MouseListener {
     }
 
     public void revealCell(int row, int column) {
+        if(gameBoard.getBoard()[row][column].hasMine) {
+                    game[row][column].setText("MINE");
+                    endGame();
+                } else {
+                if(gameBoard.neighborMines(gameBoard.getBoard()[row][column])>0) {
+                    game[row][column].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[row][column])));
+                }
+            }
 
     }
 
@@ -119,17 +127,9 @@ public class MinesweeperGUI implements MouseListener {
 
         if (SwingUtilities.isLeftMouseButton(e)) {
             // Left-click 
-            if(gameBoard.getBoard()[i][j].hasMine) {
-                    game[i][j].setText("MINE");
-                    endGame();
-                } else {
-                if(gameBoard.neighborMines(gameBoard.getBoard()[i][j])>0) {
-                    game[i][j].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[i][j])));
-                }
-            }
-            System.out.println("Left-click on row " + i + ", col " + j);
+            //System.out.println("Left-click on row " + i + ", col " + j);
             game[i][j].setEnabled(false);
-            gameBoard.revealCell(board);
+            revealCell(i,j);
         } else if (SwingUtilities.isRightMouseButton(e)) {
             // Right-click 
             game[i][j].setText("F");

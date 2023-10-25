@@ -5,7 +5,7 @@ import javax.swing.*;
 
 public class MinesweeperGUI implements MouseListener {
     static JFrame frameGame = new JFrame("Minesweeper");
-    static int cellSize = 50;
+    static int cellSize;
     static JLabel label = new JLabel();
     static JPanel panel = new JPanel();
     static JPanel boardPanel = new JPanel();
@@ -13,14 +13,14 @@ public class MinesweeperGUI implements MouseListener {
     // Boolean[][] isPressed = new Boolean[100][100];
     MinesweeperBoard gameBoard;
     int neighborMines;
-    int row;
+    private int row;
     int column;
     int firstClick;
     int minesNum;
     ImageIcon imageIcon = new ImageIcon("D:\\Flag.png"); // Replace with the actual path to your image
     Image image = imageIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
     ImageIcon flag = new ImageIcon(image);
-
+    int[][] rightClicked = new int[24][24];
 
     static class Tiles extends JButton {
         static int row;
@@ -32,11 +32,50 @@ public class MinesweeperGUI implements MouseListener {
         }
 
     }
+    public void startGame() {
+        JFrame start = new JFrame();
+        start.setSize(500, 500);
+        start.setLocationRelativeTo(null);
+        start.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        start.setLayout(new GridLayout(3, 1));
+        JButton level1 = new JButton("Level 1");
+        JButton level2 = new JButton("Level 2");
+        JButton level3 = new JButton("Level 3");
+        final int rows;
+        level1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                initialize(9, 9, 10,50);
+                start.dispose(); // Close the level selection window
+            }
+        });
+        level2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                initialize(16, 16, 40,40);
+                start.dispose();
+            }
+        });
 
-    public MinesweeperGUI(int row, int column, int minesNum) {
-        firstClick = 0;
+        level3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                initialize(24, 24, 99,35);
+                start.dispose();
+            }
+        });
+        start.add(level1);
+        start.add(level2);
+        start.add(level3);
+        start.setVisible(true);
+    }
+
+    public void initialize(int row, int column, int minesNum, int cellSize) {
+        this.cellSize = cellSize;
         this.row = row;
         this.column = column;
+        this.minesNum = minesNum;
+        firstClick = 0;
         frameGame.setSize(cellSize * row, cellSize * column);
         frameGame.setLocationRelativeTo(null);
         frameGame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,6 +100,7 @@ public class MinesweeperGUI implements MouseListener {
         int i;
         int j;
         gameBoard = new MinesweeperBoard(row, column);
+        // gameBoard.board[0][0].hasMine = true;
 
         // MinesweeperBoard board = new MinesweeperBoard(Tiles.row, Tiles.column);
         Cell[][] place = new Cell[100][100];
@@ -99,22 +139,22 @@ public class MinesweeperGUI implements MouseListener {
         if (row < 0 || row >= this.row || column < 0 || column >= this.column) {
             return;
         }
-        
+
         // Check if the cell has already been revealed
-        if (! game[row][column].isEnabled()) {
+        if (!game[row][column].isEnabled()) {
             return;
         }
         game[row][column].setEnabled(false);
         if (gameBoard.getBoard()[row][column].hasMine) {
             return;
         } else {
-        if (gameBoard.neighborMines(gameBoard.getBoard()[row][column]) > 0) {
-            game[row][column].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[row][column])));
+            if (gameBoard.neighborMines(gameBoard.getBoard()[row][column]) > 0) {
+                game[row][column].setText(Integer.toString(gameBoard.neighborMines(gameBoard.getBoard()[row][column])));
+            }
         }
-    }
-        for(int i=row-1;i<=row+1;i++) {
-            for(int j=column-1;j<=column+1;j++) {
-                cellExpansion(i,j);
+        for (int i = row - 1; i <= row + 1; i++) {
+            for (int j = column - 1; j <= column + 1; j++) {
+                cellExpansion(i, j);
             }
         }
     }
@@ -132,7 +172,8 @@ public class MinesweeperGUI implements MouseListener {
     }
 
     public static void main(String[] args) {
-        MinesweeperGUI minesweeper = new MinesweeperGUI(9, 9, 10);
+        MinesweeperGUI game = new MinesweeperGUI();
+        game.startGame();
     }
 
     @Override
@@ -159,9 +200,10 @@ public class MinesweeperGUI implements MouseListener {
         if (SwingUtilities.isLeftMouseButton(e)) {
             // Left-click
             // System.out.println("Left-click on row " + i + ", col " + j);
-            game[i][j].setEnabled(false);
-            if (firstClick == 1) {
-                if (gameBoard.getBoard()[i][j].hasMine) {
+            if (gameBoard.getBoard()[i][j].getFlagged()) {
+                e.consume();
+            } else {
+                if (firstClick == 1 && gameBoard.getBoard()[i][j].hasMine) {
                     gameBoard.getBoard()[i][j].hasMine = false;
                     System.out.print("first click");
                     Random random = new Random();
@@ -174,14 +216,21 @@ public class MinesweeperGUI implements MouseListener {
                     } while (gameBoard.getBoard()[row2][column2].hasMine);
                     gameBoard.getBoard()[row2][column2].hasMine = true;
                 }
+                game[i][j].setEnabled(false);
+                revealCell(i, j);
+                cellExpansion(i, j);
             }
-            revealCell(i, j);
-            cellExpansion(i,j);
         } else if (SwingUtilities.isRightMouseButton(e)) {
             // Right-click
-            game[i][j].setIcon(flag);
+            rightClicked[i][j]++;
+            if (rightClicked[i][j] % 2 == 1) {
+                game[i][j].setIcon(flag);
+                gameBoard.getBoard()[i][j].setFlagged(true);
+            } else {
+                game[i][j].setIcon(null);
+                gameBoard.getBoard()[i][j].setFlagged(false);
+            }
         }
-
     }
 
     @Override

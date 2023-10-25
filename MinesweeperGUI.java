@@ -17,8 +17,8 @@ public class MinesweeperGUI implements MouseListener {
     int column;
     int firstClick;
     int minesNum;
-    ImageIcon imageIcon = new ImageIcon("D:\\Flag.png"); // Replace with the actual path to your image
-    Image image = imageIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+    ImageIcon imageIcon = new ImageIcon("D:\\Flag2.png"); // Replace with the actual path to your image
+    Image image = imageIcon.getImage().getScaledInstance(230, 115, Image.SCALE_SMOOTH);
     ImageIcon flag = new ImageIcon(image);
     int[][] rightClicked = new int[24][24];
 
@@ -34,14 +34,44 @@ public class MinesweeperGUI implements MouseListener {
     }
     public void startGame() {
         JFrame start = new JFrame();
-        start.setSize(500, 500);
+        start.setSize(500, 600);
         start.setLocationRelativeTo(null);
         start.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         start.setLayout(new GridLayout(3, 1));
+        start.setResizable(false);
+
         JButton level1 = new JButton("Level 1");
         JButton level2 = new JButton("Level 2");
         JButton level3 = new JButton("Level 3");
-        final int rows;
+
+        ImageIcon level1Im1 = new ImageIcon("D:\\Level1.jpg"); 
+        Image level1Im2 = level1Im1.getImage().getScaledInstance(500, 200, Image.SCALE_SMOOTH);
+        ImageIcon level1Icon = new ImageIcon(level1Im2);
+        level1.setIcon(level1Icon);
+
+        ImageIcon level2Im1 = new ImageIcon("D:\\Level2.jpg"); 
+        Image level2Im2 = level2Im1.getImage().getScaledInstance(500, 200, Image.SCALE_SMOOTH);
+        ImageIcon level2Icon = new ImageIcon(level2Im2);
+        level2.setIcon(level2Icon);
+
+        ImageIcon level3Im1 = new ImageIcon("D:\\Level3.jpg"); 
+        Image level3Im2 = level3Im1.getImage().getScaledInstance(500, 200, Image.SCALE_SMOOTH);
+        ImageIcon level3Icon = new ImageIcon(level3Im2);
+        level3.setIcon(level3Icon); 
+
+        Font buttonFont = new Font("Arial", Font.BOLD, 18);
+        Color buttonBackground = new Color(37, 150, 190); // Navy Blue
+        Color buttonForeground = Color.WHITE; // White text
+        level1.setFont(buttonFont);
+        level2.setFont(buttonFont);
+        level3.setFont(buttonFont);
+        level1.setBackground(buttonBackground);
+        level2.setBackground(buttonBackground);
+        level3.setBackground(buttonBackground);
+        level1.setForeground(buttonForeground);
+        level2.setForeground(buttonForeground);
+        level3.setForeground(buttonForeground);
+
         level1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

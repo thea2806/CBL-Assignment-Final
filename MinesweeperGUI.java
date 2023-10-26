@@ -1,7 +1,19 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.Random;
+
+import javax.imageio.ImageIO;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import java.io.File;
+
 import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 public class MinesweeperGUI implements MouseListener {
     static JFrame frameGame = new JFrame("Minesweeper");
@@ -10,7 +22,7 @@ public class MinesweeperGUI implements MouseListener {
     static JPanel panel = new JPanel();
     static JPanel boardPanel = new JPanel();
     JButton[][] game = new JButton[100][100];
-    // Boolean[][] isPressed = new Boolean[100][100];
+    Color tileColor;
     MinesweeperBoard gameBoard;
     int neighborMines;
     private int row;
@@ -21,6 +33,12 @@ public class MinesweeperGUI implements MouseListener {
     Image image = imageIcon.getImage().getScaledInstance(230, 115, Image.SCALE_SMOOTH);
     ImageIcon flag = new ImageIcon(image);
     int[][] rightClicked = new int[24][24];
+    Border customBorder = new CompoundBorder(
+            new LineBorder(new Color(250, 242, 237), 1), // Outer border (color of your choice)
+            BorderFactory.createRaisedBevelBorder() // Inner empty border for margin
+    );
+    Color navy = new Color(50, 41, 158);
+    // ImageIcon gameOver = new ImageIcon("D:\\gameOver.jpg");
 
     static class Tiles extends JButton {
         static int row;
@@ -32,75 +50,11 @@ public class MinesweeperGUI implements MouseListener {
         }
 
     }
-    public void startGame() {
-        JFrame start = new JFrame();
-        start.setSize(500, 600);
-        start.setLocationRelativeTo(null);
-        start.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        start.setLayout(new GridLayout(3, 1));
-        start.setResizable(false);
 
-        JButton level1 = new JButton("Level 1");
-        JButton level2 = new JButton("Level 2");
-        JButton level3 = new JButton("Level 3");
 
-        ImageIcon level1Im1 = new ImageIcon("D:\\Level1.jpg"); 
-        Image level1Im2 = level1Im1.getImage().getScaledInstance(500, 200, Image.SCALE_SMOOTH);
-        ImageIcon level1Icon = new ImageIcon(level1Im2);
-        level1.setIcon(level1Icon);
 
-        ImageIcon level2Im1 = new ImageIcon("D:\\Level2.jpg"); 
-        Image level2Im2 = level2Im1.getImage().getScaledInstance(500, 200, Image.SCALE_SMOOTH);
-        ImageIcon level2Icon = new ImageIcon(level2Im2);
-        level2.setIcon(level2Icon);
-
-        ImageIcon level3Im1 = new ImageIcon("D:\\Level3.jpg"); 
-        Image level3Im2 = level3Im1.getImage().getScaledInstance(500, 200, Image.SCALE_SMOOTH);
-        ImageIcon level3Icon = new ImageIcon(level3Im2);
-        level3.setIcon(level3Icon); 
-
-        Font buttonFont = new Font("Arial", Font.BOLD, 18);
-        Color buttonBackground = new Color(37, 150, 190); // Navy Blue
-        Color buttonForeground = Color.WHITE; // White text
-        level1.setFont(buttonFont);
-        level2.setFont(buttonFont);
-        level3.setFont(buttonFont);
-        level1.setBackground(buttonBackground);
-        level2.setBackground(buttonBackground);
-        level3.setBackground(buttonBackground);
-        level1.setForeground(buttonForeground);
-        level2.setForeground(buttonForeground);
-        level3.setForeground(buttonForeground);
-
-        level1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                initialize(9, 9, 10,50);
-                start.dispose(); // Close the level selection window
-            }
-        });
-        level2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                initialize(16, 16, 40,40);
-                start.dispose();
-            }
-        });
-
-        level3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                initialize(24, 24, 99,35);
-                start.dispose();
-            }
-        });
-        start.add(level1);
-        start.add(level2);
-        start.add(level3);
-        start.setVisible(true);
-    }
-
-    public void initialize(int row, int column, int minesNum, int cellSize) {
+    public void initialize(int row, int column, int minesNum, int cellSize, Color tileColor) {
+        this.tileColor = tileColor;
         this.cellSize = cellSize;
         this.row = row;
         this.column = column;
@@ -114,8 +68,9 @@ public class MinesweeperGUI implements MouseListener {
         label.setHorizontalAlignment(JLabel.CENTER);
         label.setOpaque(true);
         label.setText("Minesweeper");
-        label.setBackground(Color.BLUE);
-        label.setFont(new Font("Arial", Font.BOLD, 22));
+        label.setBackground(navy);
+        label.setFont(new Font("Arial", Font.BOLD, 18));
+        label.setForeground(new Color(250, 242, 237));
 
         panel.setLayout(new BorderLayout());
         panel.add(label);
@@ -140,6 +95,8 @@ public class MinesweeperGUI implements MouseListener {
                 Tiles tile = new Tiles(i, j);
                 tile.setMargin(new Insets(0, 0, 0, 0));
                 tile.setPreferredSize(new Dimension(cellSize, cellSize));
+                tile.setBackground(tileColor);
+                tile.setBorder(customBorder);
                 Cell cell = new Cell(i, j);
                 // board.hasMine = true;
                 game[i][j] = tile;
@@ -155,8 +112,130 @@ public class MinesweeperGUI implements MouseListener {
         frameGame.setVisible(true);
     }
 
+    public void levelSound() {
+        try {
+            // Load an audio file
+            File soundFile = new File("D:\\LevelSound2.wav");
+            Clip clip1 = AudioSystem.getClip();
+            clip1.open(AudioSystem.getAudioInputStream(soundFile));
+
+            Thread soundThread = new Thread(() -> {
+                clip1.start();
+                // You can optionally add a delay or sleep here
+                try {
+                    Thread.sleep(clip1.getMicrosecondLength() / 10);
+                } catch (InterruptedException e3) {
+                    e3.printStackTrace();
+                }
+                clip1.close();
+            });
+            soundThread.start();
+
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+    }
+
+    public void tileSound() {
+        try {
+            // Load an audio file
+            File soundFile = new File("D:\\TileSound.wav");
+            Clip clip1 = AudioSystem.getClip();
+            clip1.open(AudioSystem.getAudioInputStream(soundFile));
+
+            Thread soundThread = new Thread(() -> {
+                clip1.start();
+                // You can optionally add a delay or sleep here
+                try {
+                    Thread.sleep(clip1.getMicrosecondLength() / 10);
+                } catch (InterruptedException e3) {
+                    e3.printStackTrace();
+                }
+                clip1.close();
+            });
+            soundThread.start();
+
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+    }
+
+    public void flagSound() {
+        try {
+            // Load an audio file
+            File soundFile = new File("D:\\FlagSound.wav");
+            Clip clip1 = AudioSystem.getClip();
+            clip1.open(AudioSystem.getAudioInputStream(soundFile));
+
+            Thread soundThread = new Thread(() -> {
+                clip1.start();
+                // You can optionally add a delay or sleep here
+                try {
+                    Thread.sleep(clip1.getMicrosecondLength() / 10);
+                } catch (InterruptedException e3) {
+                    e3.printStackTrace();
+                }
+                clip1.close();
+            });
+            soundThread.start();
+
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+    }
+
+    public void bombSound() {
+        try {
+            // Load an audio file
+            File soundFile = new File("D:\\BombSound.wav");
+            Clip clip1 = AudioSystem.getClip();
+            clip1.open(AudioSystem.getAudioInputStream(soundFile));
+
+            Thread soundThread = new Thread(() -> {
+                clip1.start();
+                // You can optionally add a delay or sleep here
+                try {
+                    Thread.sleep(clip1.getMicrosecondLength() / 10);
+                } catch (InterruptedException e3) {
+                    e3.printStackTrace();
+                }
+                clip1.close();
+            });
+            soundThread.start();
+
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+    }
+
+    public void resultsSound() {
+        try {
+            // Load an audio file
+            File soundFile = new File("D:\\OutroMusic.wav");
+            Clip clip1 = AudioSystem.getClip();
+            clip1.open(AudioSystem.getAudioInputStream(soundFile));
+
+            Thread soundThread = new Thread(() -> {
+                clip1.start();
+                // You can optionally add a delay or sleep here
+                try {
+                    Thread.sleep(clip1.getMicrosecondLength() / 10000);
+                } catch (InterruptedException e3) {
+                    e3.printStackTrace();
+                }
+                clip1.close();
+            });
+            soundThread.start();
+
+        } catch (Exception e2) {
+            e2.printStackTrace();
+        }
+    }
+
     public void revealCell(int row, int column) {
+        gameBoard.getBoard()[row][column].setRevealed();
         if (gameBoard.getBoard()[row][column].hasMine) {
+            bombSound();
             endGame();
         } else {
             if (gameBoard.neighborMines(gameBoard.getBoard()[row][column]) > 0) {
@@ -194,17 +273,19 @@ public class MinesweeperGUI implements MouseListener {
     }
 
     public void endGame() {
+        resultsSound();
+        ImageIcon imageIcon = new ImageIcon("D:\\gameOver.jpg"); // Replace with the actual path to your image
+        Image image = imageIcon.getImage().getScaledInstance(cellSize*row, cellSize*column, Image.SCALE_SMOOTH);
+        ImageIcon gameOver = new ImageIcon(image);
+        JLabel imageLabel = new JLabel(gameOver);
         JPanel results = new JPanel();
         results.setSize(500, 500);
-        results.setBackground(Color.BLUE);
+        results.add(imageLabel);
+        results.setBackground(navy);
         boardPanel.setVisible(false);
         frameGame.add(results);
     }
 
-    public static void main(String[] args) {
-        MinesweeperGUI game = new MinesweeperGUI();
-        game.startGame();
-    }
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -232,7 +313,9 @@ public class MinesweeperGUI implements MouseListener {
             // System.out.println("Left-click on row " + i + ", col " + j);
             if (gameBoard.getBoard()[i][j].getFlagged()) {
                 e.consume();
-            } else {
+            } else if (!gameBoard.getBoard()[i][j].revealed) {
+                tileSound();
+                game[i][j].setBackground(new Color(250, 242, 237));
                 if (firstClick == 1 && gameBoard.getBoard()[i][j].hasMine) {
                     gameBoard.getBoard()[i][j].hasMine = false;
                     System.out.print("first click");
@@ -252,13 +335,18 @@ public class MinesweeperGUI implements MouseListener {
             }
         } else if (SwingUtilities.isRightMouseButton(e)) {
             // Right-click
-            rightClicked[i][j]++;
-            if (rightClicked[i][j] % 2 == 1) {
-                game[i][j].setIcon(flag);
-                gameBoard.getBoard()[i][j].setFlagged(true);
+            if (gameBoard.getBoard()[i][j].revealed) {
+                e.consume();
             } else {
-                game[i][j].setIcon(null);
-                gameBoard.getBoard()[i][j].setFlagged(false);
+                rightClicked[i][j]++;
+                flagSound();
+                if (rightClicked[i][j] % 2 == 1) {
+                    game[i][j].setIcon(flag);
+                    gameBoard.getBoard()[i][j].setFlagged(true);
+                } else {
+                    game[i][j].setIcon(null);
+                    gameBoard.getBoard()[i][j].setFlagged(false);
+                }
             }
         }
     }

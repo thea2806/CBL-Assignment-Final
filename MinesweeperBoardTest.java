@@ -34,32 +34,28 @@ public class MinesweeperBoardTest {
         assertEquals(expectedResult3, level3.neighborMines(test3));
     }
 
-    /**
-     * We test whether this method places the correct number of mines on the board, meaning that
-     * it doesn't place two mines in the same cell.
-     * For this, we will first create the test cases for a method that returns an int, which should
-     * be the same as the number of bombs in the parameter. After we implement this method
-     * and it passes the all the tests, we will change it to a void method, which we need in our 
-     * program.
-     */
     @Test 
-    public void generateMinesTest() {
+    public void unflaggedMinesTest() {
 
         //Test case for level one that has 10 mines
         int test1 = 10;
-        int expectedResult1 = test1;
-        assertEquals(expectedResult1, level1.generateMines(level1.getBoard(), test1));
+        int expectedResult1 = 7;
+        level1.board[3][4].hasFlag = true;
+        level1.board[4][6].hasFlag = true;
+        level1.board[6][6].hasFlag = true;
+        assertEquals(expectedResult1, level1.unflaggedMines(level1.getBoard(), test1));
 
         //Test case for level two that has 40 mines
         int test2 = 40;
         int expectedResult2 = test2;
-        assertEquals(expectedResult2, level2.generateMines(level2.getBoard(), test2));
+        assertEquals(expectedResult2, level2.unflaggedMines(level2.getBoard(), test2));
 
         //Test case for level three that has 99 mines
         int test3 = 99;
         int expectedResult3 = test3;
-        assertEquals(expectedResult3, level3.generateMines(level3.getBoard(), test3));
+        assertEquals(expectedResult3, level3.unflaggedMines(level3.getBoard(), test3));
     }
+
 
     /**
      * We test whether this method places the correct number of abilities on the board, meaning 
